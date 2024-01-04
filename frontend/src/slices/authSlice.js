@@ -6,7 +6,7 @@ const initialState = {
     ? JSON.parse(localStorage.getItem("userInfo"))
     : null,
 };
-
+// This of for the local stuff like in the front end part in redux and react
 const authSlice = createSlice({
   name: "auth", //name
   initialState, //
