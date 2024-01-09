@@ -1,5 +1,5 @@
 import asyncHandler from "../middleware/asyncHandler.js";
-import order from "../models/orderModel.js";
+import Order from "../models/orderModel.js";
 
 // @desc create new order
 // @route POST /api/orders
@@ -21,7 +21,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
     throw new Error("No order items");
   } else {
     // this will put it in the variables but will not be saved to the database
-    const order = new order({
+    const order = new Order({
       orderItems: orderItems.map((x) => ({
         ...x,
         product: x._id,
@@ -36,7 +36,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
       totalPrice,
     });
 
-    // we want to await for for the order and let the data comes and then save it to the database
+    // we want to await for for the order and let the data comes and then save it to the database.
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
   }
@@ -47,7 +47,8 @@ const addOrderItems = asyncHandler(async (req, res) => {
 //@access Private
 
 const getMyOrders = asyncHandler(async (req, res) => {
-  res.send("Get my orders");
+  const orders = await order.find({ user: req.user._id });
+  res.status(200).json(orders);
 });
 
 // @desc Get  order by Id
@@ -55,7 +56,16 @@ const getMyOrders = asyncHandler(async (req, res) => {
 //@access Private
 
 const getOrderById = asyncHandler(async (req, res) => {
-  res.send("Get order by id");
+  const order = await order
+    .findById(req.params.id) //find by id
+    .populate("user", "name email"); //it will populate user and email id
+
+  if (order) {
+    res.status(200).json(order);
+  } else {
+    res.status(404);
+    throw new Error("Order not found");
+  }
 });
 
 // @desc Update order to paid
